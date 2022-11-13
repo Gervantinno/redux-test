@@ -1,32 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ToDosView from "./ToDos.view";
-import { useDispatch } from "react-redux";
-import { useTypedSelector } from "../../hooks/useTypedSelector";
-import {
-  addTodoAction,
-  deleteTodoAction,
-} from "../../redux/reducers/todoReducer";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import { fetchTodoAction } from "../../redux/actions/fetchTodoAction";
 
 type Props = {};
 
 const ToDos: React.FC<Props> = () => {
-  const state = useTypedSelector((state) => state.todo);
-  const dispatch = useDispatch();
+  const state = useAppSelector((state) => state.todoReducer);
+  const dispatch = useAppDispatch();
 
-  function addTodo() {
-    const text = prompt("Inset the text of todo");
-    if (!text) {
-      alert("You cannot enter empty string");
-      return;
-    }
-    dispatch(addTodoAction(text));
-  }
+  useEffect(() => {
+    dispatch(fetchTodoAction());
+  }, []);
 
-  function deleteTodo(id: number) {
-    dispatch(deleteTodoAction(id));
-  }
-
-  return <ToDosView todo={state} addTodo={addTodo} deleteTodo={deleteTodo} />;
+  return <ToDosView state={state} />;
 };
 
 export default ToDos;

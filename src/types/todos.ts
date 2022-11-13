@@ -1,20 +1,11 @@
+export interface ITodo {
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+}
 export interface TodoState {
-  todos: { id: number; text: string }[];
+  todos: ITodo[];
+  isLoading: boolean;
+  error: string;
 }
-
-export enum todoActionTypes {
-  ADD_TODO = "ADD_TODO",
-  DELETE_TODO = "DELETE_TODO",
-}
-
-export interface addTodoActionType {
-  type: todoActionTypes.ADD_TODO;
-  payload: string;
-}
-
-export interface deleteTodoActionType {
-  type: todoActionTypes.DELETE_TODO;
-  payload: number;
-}
-
-export type todoAction = addTodoActionType | deleteTodoActionType;

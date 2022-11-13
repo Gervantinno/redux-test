@@ -1,52 +1,47 @@
-import {
-  addTodoActionType,
-  deleteTodoActionType,
-  todoAction,
-  todoActionTypes,
-  TodoState,
-} from "../../types/todos";
+import { ITodo, TodoState } from "../../types/todos";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { fetchTodoAction } from "../actions/fetchTodoAction";
 
 const initialState: TodoState = {
   todos: [],
+  isLoading: false,
+  error: "",
 };
 
-export function todoReducer(
-  state = initialState,
-  action: todoAction
-): TodoState {
-  switch (action.type) {
-    case todoActionTypes.ADD_TODO: {
-      return {
-        ...state,
-        todos: [
-          ...state.todos,
-          {
-            id:
-              state.todos.reduce(
-                (prev, current) => Math.max(prev, current.id),
-                0
-              ) + 1,
-            text: action.payload,
-          },
-        ],
-      };
-    }
-    case todoActionTypes.DELETE_TODO: {
-      return {
-        ...state,
-        todos: [...state.todos.filter((todo) => todo.id !== action.payload)],
-      };
-    }
-    default: {
-      return state;
-    }
-  }
-}
+export const todoSlice = createSlice({
+  name: "todo",
+  initialState,
+  reducers: {
+    usersFetching(state) {
+      state.isLoading = true;
+    },
+    usersFetchingSuccess(state, action: PayloadAction<ITodo[]>) {
+      state.isLoading = false;
+      state.error = "";
+      state.todos = action.payload;
+    },
+    usersFetchingError(state, action: PayloadAction<string>) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+  },
+  extraReducers: {
+    [fetchTodoAction.pending.type]: (state) => {
+      state.isLoading = true;
+    },
+    [fetchTodoAction.fulfilled.type]: (
+      state,
+      action: PayloadAction<ITodo[]>
+    ) => {
+      state.isLoading = false;
+      state.error = "";
+      state.todos = action.payload;
+    },
+    [fetchTodoAction.rejected.type]: (state, action: PayloadAction<string>) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+  },
+});
 
-export function addTodoAction(text: string): addTodoActionType {
-  return { type: todoActionTypes.ADD_TODO, payload: text };
-}
-
-export function deleteTodoAction(id: number): deleteTodoActionType {
-  return { type: todoActionTypes.DELETE_TODO, payload: id };
-}
+export default todoSlice.reducer;
